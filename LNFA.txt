@@ -1,0 +1,51 @@
+g = open("data.out", "w")
+
+transitions = {}
+words = []
+with open("data.in") as f:
+    number_of_states = int(f.readline())
+    states = [int(state) for state in f.readline().split()]
+
+    number_of_letters = int(f.readline())
+    letters = [letter for letter in f.readline().split()]
+
+    initial_state = int(f.readline())
+
+    number_of_final_states = int(f.readline())
+    final_states = [final_state for final_state in f.readline().split()]
+
+    number_of_transitions = int(f.readline())
+    for i in range(number_of_transitions):
+        (start, letter, finish) = f.readline().split()
+        (start, finish) = (int(start), int(finish))
+        # Convert NFA transitions to LNFA transitions
+        if start not in transitions:
+            transitions[start] = {}
+        if letter not in transitions[start]:
+            transitions[start][letter] = set()
+        transitions[start][letter].add(finish)
+
+    number_of_tests = int(f.readline())
+    for i in range(number_of_tests):
+        words.append(f.readline().split('\n')[0])
+
+def dfs(state, current_index):
+    if current_index == len(word):
+        return str(state) in final_states
+
+    next_states = transitions.get(state, {}).get(word[current_index], set())
+    for next_state in next_states:
+        if dfs(next_state, current_index + 1):
+            return True
+
+    return False
+
+for word in words:
+    index = 0
+    current_state = initial_state
+    if dfs(current_state, index):
+        g.write("DA\n")
+    else:
+        g.write("NU\n")
+
+g.close()

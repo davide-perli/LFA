@@ -1,0 +1,68 @@
+g = open("data.out", "w")
+
+
+transitions = {}
+words = []
+with open("data.in") as f:
+    number_of_states = int(f.readline())
+    states = [int(state) for state in f.readline().split()]
+    
+    number_of_letters = int(f.readline())
+    letters = [letter for letter in f.readline().split()]
+    
+    initial_state = int(f.readline())
+    
+    number_of_final_states = int(f.readline())
+    final_states = [final_state for final_state in f.readline().split()]
+    
+    number_of_transitions = int(f.readline())
+    for i in range(number_of_transitions) : 
+        (start, letter, finish) = f.readline().split()
+        (start, finish) = (int(start), int(finish))
+        if start not in transitions:
+            transitions[start] = []
+        transitions[start].append((letter, finish))
+        
+    number_of_tests = int(f.readline())
+    for i in range(number_of_tests):
+        words.append(f.readline().split('\n')[0])
+    
+
+print(final_states)
+for word in words:
+    index = 0
+    
+    current_state = initial_state
+    drum = [initial_state]
+    
+    while index < len(word) :
+        dictionary = {}
+        for pair in transitions[current_state] :
+            dictionary[pair[0]] = pair[1]
+           
+        if word[index] in dictionary.keys() :
+            found_key = None
+            for key in dictionary.keys() :
+                if word[index] == key :
+                    found_key = key
+                    break
+            
+            current_state = dictionary[found_key]
+            drum.append(current_state)
+        else:
+            g.write("NU\n")
+            break
+        index += 1
+    else:
+        if str(current_state) in final_states:
+            g.write("DA\n")
+        else:
+            g.write("NU\n")
+
+
+    
+    
+
+
+
+        
