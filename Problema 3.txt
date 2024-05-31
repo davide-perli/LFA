@@ -1,0 +1,57 @@
+class DFA:
+    def __init__(self, states, alphabet, transition_function, initial_state, final_states):
+        self.states = states  # Mulțimea de stări
+        self.alphabet = alphabet  # Alfabetul
+        self.transition_function = transition_function  # Funcția de tranziție
+        self.initial_state = initial_state  # Starea inițială
+        self.final_states = final_states  # Mulțimea de stări finale
+
+def get_complement_dfa(dfa):
+    # Calculăm stările finale ale complementului
+    complement_final_states = set(dfa.states) - set(dfa.final_states)
+    return DFA(
+        dfa.states,
+        dfa.alphabet,
+        dfa.transition_function,
+        dfa.initial_state,
+        complement_final_states
+    )
+
+def is_language_empty(dfa):
+    # Folosim DFS pentru a verifica dacă există o cale către oricare dintre stările finale în DFA complement
+    stack = [dfa.initial_state]  # Inițializăm stiva cu starea inițială
+    visited = set()  # Mulțimea de stări vizitate
+
+    while stack:
+        current_state = stack.pop()  # Extragem starea curentă din stivă
+        if current_state in dfa.final_states:
+            return False  # Am găsit o cale către o stare finală
+
+        if current_state not in visited:
+            visited.add(current_state)  # Marcam starea curentă ca vizitată
+            for symbol in dfa.alphabet:
+                next_state = dfa.transition_function.get((current_state, symbol))
+                if next_state is not None and next_state not in visited:
+                    stack.append(next_state)  # Adăugăm următoarea stare în stivă
+    
+    return True  # Nu am găsit nicio cale către vreo stare finală
+
+# Exemplu de DFA
+states = {'q0', 'q1'}
+alphabet = {'0', '1'}
+transition_function = {
+    ('q0', '0'): 'q1',
+    ('q0', '1'): 'q0',
+    ('q1', '0'): 'q0',
+    ('q1', '1'): 'q1'
+}
+initial_state = 'q0'
+final_states = {'q1'}
+
+dfa = DFA(states, alphabet, transition_function, initial_state, final_states)
+complement_dfa = get_complement_dfa(dfa)
+
+if is_language_empty(complement_dfa):
+    print("Complementul limbajului este limbajul vid.")
+else:
+    print("Complementul limbajului nu este limbajul vid.")
