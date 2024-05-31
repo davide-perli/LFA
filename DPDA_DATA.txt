@@ -1,0 +1,21 @@
+5
+0 1 2 3 4
+2
+a b
+0
+2
+3 4
+3
+Z X Y
+Z
+6
+0 a Z 1 XZ
+1 a X 1 XX
+1 b X 2 e
+2 b X 2 e
+2 e Z 3 Z
+3 e Z 4 e
+3
+aaabbb
+ab
+aabb

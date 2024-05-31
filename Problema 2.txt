@@ -1,0 +1,53 @@
+def is_language_empty(initial_state, final_states):
+    if initial_state in final_states:
+        return False
+
+    visited = set()  
+    stack = [initial_state] 
+
+    while stack:
+        current_state = stack.pop() 
+        if current_state in final_states:
+            return False 
+
+        visited.add(current_state)  
+    
+        for next_state in transitions.get(current_state, {}).values():
+            if next_state not in visited:
+                stack.append(next_state)  
+
+    return True
+
+
+transitions = {}
+with open("data.in") as f:
+
+    numar_stari = int(f.readline())
+   
+    states = [int(state) for state in f.readline().split()]
+
+
+    numar_litere = int(f.readline())
+   
+    letters = [letter for letter in f.readline().split()]
+   
+    initial_state = int(f.readline())
+
+    numar_stari_finale = int(f.readline())
+    
+    final_states = [int(final_state) for final_state in f.readline().split()]
+
+    numar_tranzitii = 0  
+    for line in f:  
+        parts = line.split() 
+        if len(parts) == 3:  
+            start, letter, end = parts  
+            start, end = int(start), int(end)
+            if start not in transitions:
+                transitions[start] = {} 
+            transitions[start][letter] = end  
+            numar_tranzitii += 1 
+
+
+limbaj_vid = is_language_empty(initial_state, final_states)
+print("Limbajul recunoscut este vid." if limbaj_vid else "Limbajul recunoscut nu este vid.")

@@ -1,0 +1,88 @@
+g = open("data.out", "w")
+
+transitions = {}
+words = []
+
+with open("data.in") as f:
+    number_of_states = int(f.readline())
+    states = [int(state) for state in f.readline().split()]
+    
+    number_of_letters = int(f.readline())
+    letters = [letter for letter in f.readline().split()]
+    
+    initial_state = int(f.readline())
+    
+    number_of_final_states = int(f.readline())
+    final_states = [int(final_state) for final_state in f.readline().split()]
+    
+    number_of_stack_symbols = int(f.readline())
+    stack_symbols = [symbol for symbol in f.readline().split()]
+    
+    initial_stack_symbol = f.readline().strip()
+    
+    number_of_transitions = int(f.readline())
+    for i in range(number_of_transitions):
+        (start, letter, stack_top, finish, stack_push) = f.readline().split()
+        (start, finish) = (int(start), int(finish))
+        if start not in transitions:
+            transitions[start] = []
+        transitions[start].append((letter, stack_top, finish, stack_push))
+        
+    number_of_tests = int(f.readline())
+    for i in range(number_of_tests):
+        words.append(f.readline().strip())
+    
+def dpda_accepts(word):
+    stack = [initial_stack_symbol]
+    current_state = initial_state
+    index = 0
+
+    while index < len(word):
+        symbol = word[index]
+        stack_top = stack[-1] if stack else None
+        found_transition = False
+        
+        if current_state in transitions:
+            for (trans_symbol, trans_stack_top, next_state, stack_action) in transitions[current_state]:
+                if trans_symbol == symbol and trans_stack_top == stack_top:
+                    found_transition = True
+                    current_state = next_state
+                    if stack_action != 'e':
+                        stack.pop()
+                        for symbol in reversed(stack_action):
+                            stack.append(symbol)
+                    else:
+                        stack.pop()
+                    break
+        
+        if not found_transition:
+            return False
+        
+        index += 1
+    
+    while current_state in transitions:
+        stack_top = stack[-1] if stack else None
+        found_transition = False
+        for (trans_symbol, trans_stack_top, next_state, stack_action) in transitions[current_state]:
+            if trans_symbol == 'e' and trans_stack_top == stack_top:
+                found_transition = True
+                current_state = next_state
+                if stack_action != 'e':
+                    stack.pop()
+                    for symbol in reversed(stack_action):
+                        stack.append(symbol)
+                else:
+                    stack.pop()
+                break
+        if not found_transition:
+            break
+    
+    return current_state in final_states and not stack
+
+for word in words:
+    if dpda_accepts(word):
+        g.write("DA\n")
+    else:
+        g.write("NU\n")
+
+g.close()
